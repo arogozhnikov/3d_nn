@@ -8,8 +8,10 @@
 	<style type="text/css">
 		body {
 			background-color: black;
+			/*background-color: grey;*/
 			margin: 0;
 			padding: 0;
+			min-width: 800px;
 		}
 		
 		a {
@@ -25,14 +27,65 @@
 			bottom: 0;
 			margin: auto;
 		}
+		#control_container{
+			text-align: center;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			color: #bbb;
+		}
+		.control-group{
+			display: inline-block;
+			text-align: center;
+			margin-right: 30px;
+		}
+		table.control-table {
+			margin: 20px auto;
+		}
+		table.control-table td.weight-control{
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+			border: 1px solid black;
+			vertical-align: middle;
+			text-align: center;
+		}
+		.button-control{
+			display: inline-block;
+			padding: 10px;
+			background-color: #555;
+			border-radius: 2px;
+			cursor: pointer;
+			font-weight: bold;
+
+		}
+		.button-control:hover{
+			background-color: #777;			
+		}
 	</style>
 </head>
 
 <body>
 	<div id="canvas_container">
-		None
+		
 	</div>
-	<script src="https://threejs.org/examples/../build/three.js"></script>
+	<div id='control_container'>
+		<div id='main_controls'>
+			<span class='control-group button-control' id='randomize_button' >Randomize weights!</span>
+			<span class='control-group'>
+				<input type="checkbox" checked="checked" name="animate_checkbox" id="animate_checkbox" />
+				<label for="animate_checkbox">animate level of surface</label>
+			</span>			
+			<span class='control-group'>
+				x =<span id='level_display'> </span> <br />
+				<input type="range" name="animate_level" id="animate_level" min="0" max="1" />
+				<!--<label for="animate_level">animate level of surface</label>-->
+			</span>			
+		</div>
+		<span class='control'></span>
+	</div>
+
+	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+
+	<script src="https://threejs.org/build/three.js"></script>
 	<script src="https://threejs.org/examples/js/controls/FlyControls.js"></script>
 
 	<script src="https://threejs.org/examples/js/libs/stats.min.js"></script>
