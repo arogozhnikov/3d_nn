@@ -1,4 +1,4 @@
-fragment_shader = `
+var fragment_shader = `
 precision highp float;
 uniform vec2 resolution;
 uniform vec3 cameraPos;
@@ -83,9 +83,8 @@ vec3 getRayColor( vec3 origin, vec3 ray) {
 		if ( abs(dist - floor(dist + 0.5)) < EPS ) break;
 	}
 
+	// left sphere
 	if (length(p) > blind_radius) {
-		// killing outside radius
-		// return vec3(1, 0, 0);
 		discard;
 	}
 
@@ -93,11 +92,13 @@ vec3 getRayColor( vec3 origin, vec3 ray) {
 	vec3 color;
 	if ( abs(dist - floor(dist + 0.5)) < EPS ) {
 		vec3 normal = getNormal(p);
-		float diffuse = clamp( dot( lightDir, normal ), 0.2, 1.0 );
+		if(dot(normal, ray) > 0.){
+			normal = - normal;
+		}
+		float diffuse = clamp( dot( lightDir, normal ), 0.3, 1.0 );
 		float specular = pow( clamp( dot( reflect( lightDir, normal ), ray ), 0.0, 1.0 ), 10.0 ) + 0.2;
-		color = ( sceneColor( p ).rgb * diffuse + vec3( 0.8 ) * specular ) ;
+		color = ( sceneColor( p ).rgb * diffuse + vec3( 0.7 ) * specular ) ;
 	} else {
-		// return vec3(0, 1, 0);
 		discard;
 	}
 	return color; 
@@ -105,7 +106,7 @@ vec3 getRayColor( vec3 origin, vec3 ray) {
 
 void main(void) {
 	// fragment position
-	vec2 p = ( gl_FragCoord.xy * 2.0 - resolution ) / min( resolution.x, resolution.y );
+	vec2 p = ( gl_FragCoord.xy * 2.0 - resolution ) / min( resolution.x, resolution.y ) / 2.;
 	// camera and ray
 	vec3 cPos  = cameraPos;
 	vec3 cDir  = cameraDir;
@@ -126,14 +127,14 @@ void main(void) {
 	gl_FragColor = vec4(color, 0.6);
 	// webGL doesn't fully support gl_FragDepth. ARGH!
 }
-`
+`;
 
 var raymarch_vertex_shader = `
 attribute vec3 position;
 void main(void) {
 	gl_Position = vec4(position, 1.0);
 }
-`
+`;
 
 var lines_vertex_shader = `
 // attribute vec3 position;
@@ -173,22 +174,16 @@ vec3 getGradient( vec3 p ) {
 
 void main(void) {
 	float index = floor(position[0] / 100.);
-	float step = index * 0.02;
-	p = vec3(mod(position[0], 100.) - 10., position[1], position[2]) * 1.2 ;
+	float step = (index - 4.) * 0.02;
+	p = vec3(mod(position[0], 100.) - 10., position[1], position[2]);
 	for (int i=0; i < 20; i++) {
 		p += normalize(getGradient(p)) * step;
 	}
-	// int index_ = int(index);
-	// float step = 0.01 / 2.;
-	// p = vec3(mod(position[0], 100.) - 10., position[1], position[2]) * 1.2 ;
-	// for (int i=0; i < 2 * index_; i++) {
-	// 	p += normalize(getGradient(p)) * step;
-	// }
 	value = evaluate_nn(p);
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( p , 1.0 );
 	screen_position = gl_Position;
-}
-`
+} 
+`;
 	
 var lines_fragment_shader = `
 uniform vec3 color;
@@ -203,41 +198,53 @@ void main() {
 	}
 	float time_delta = fract(surface_level - value); 
 	
-	// gl_FragColor = vec4(0.5 + value / 5., (0.5 + value / 3.) * 0.3, 0.5 - value / 3., exp(-10. * time_delta) * 0.4 );
-	gl_FragColor = vec4(0.5 + value / 10., 0.25, 0.5 - value / 4.,  exp(-7. * time_delta) * 0.4 );
-	// gl_FragColor = vec4(1., 1., 1., exp(-5. * time_delta) );
+	gl_FragColor = vec4(0.5 + value / 10., 0.25 - value / 10., 0.5 - value / 4.,  exp(-7. * time_delta) * 0.4 );
 	return;
 }
-`
+`;
 
 var position_camera, dummy_camera, dummy_scene, controls, renderer;
 var dummy_geometry, dummy_material, dummy_mesh, lines_geometry, lines_material;
+var animation_loop = 5; // seconds
+
+var capturer = null;
 
 var mouse = new THREE.Vector2( 0.5, 0.5 );
-var canvas_size = 512;
+var canvas_size = 400;
 var canvas;
-var stats;
-var clock = new THREE.Clock();
-var config = {
+// var stats;
+// var clock = new THREE.Clock();
+// var config = {
 	// saveImage: function() {
 	// 	renderer.render( scene, dummy_camera );
 	// 	window.open( canvas.toDataURL() );
 	// },
 	// freeCamera: false,
-	resolution: '512'
-};
+	// resolution: canvas_size
+// };
 
+var animate_control = document.getElementById('animate_checkbox');
+var level_control = document.getElementById('animate_level');
+var azimuth_control = document.getElementById('camera_azimuth_control');
+var altitude_control = document.getElementById('camera_altitide_control');
+
+
+animate_control.onchange = animate_control.oninput = function(){
+	var group = document.getElementById('surface-control-group');
+	if(animate_control.checked){
+		group.classList.add('invisible');
+	} else {
+		group.classList.remove('invisible');
+	}
+}
 
 function init() {
 	dummy_scene = new THREE.Scene();
 	lines_scene = new THREE.Scene();
 	dummy_camera = new THREE.Camera();
-	position_camera = new THREE.PerspectiveCamera( 45 * 2 /* degrees */, 1. /* aspect */, 1 /*near plane*/, 1000 /* far plane */ );
-	position_camera.lookAt( new THREE.Vector3( 0.0, 0.0, 0.0 ) );
+	position_camera = new THREE.PerspectiveCamera( Math.atan(1 / 2.) * (180. / Math.PI) * 2 /* degrees */, 1. /* aspect */, 1 /*near plane*/, 1000 /* far plane */ );
 	dummy_geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
 
-	// var weights_W = [new THREE.Matrix4(), new THREE.Matrix4()];
-	// var weights_V = [new THREE.Vector4(), THREE.Vector4()];
 	var uniforms = {
 			resolution: { value: new THREE.Vector2( canvas_size, canvas_size ) },
 			cameraPos:  { value: position_camera.getWorldPosition() },
@@ -261,10 +268,18 @@ function init() {
 	renderer.setSize( canvas_size, canvas_size );
 
 	canvas = renderer.domElement;
-	canvas.addEventListener( 'mousemove', onMouseMove );
+	canvas.addEventListener( 'mousemove', function( e ) {
+		mouse.x = e.offsetX / canvas.width;
+		mouse.y = e.offsetY / canvas.height;
+	});
+	canvas.addEventListener( 'mouseleave', function(){
+		mouse.x = 0.5;
+		mouse.y = 0.5;
+	});
+	canvas.id = 'main_canvas';
 	document.getElementById('canvas_container').appendChild( canvas ); 
 
-	// TODO convert to a single line
+	// TODO convert set of lines to a single line
 	lines_material = new THREE.ShaderMaterial( {
 		uniforms:       uniforms,
 		vertexShader:   lines_vertex_shader,
@@ -289,25 +304,31 @@ function init() {
 		}
 	}	
 
+	helper = new THREE.AxisHelper(6.);
+	helper.material.transparent = true;
+	helper.material.opacity = 0.6;
+	lines_scene.add(helper);
 
-	var gui = new dat.GUI();
-	gui.add( config, 'resolution', [ '256', '512', '800' ] ).name( 'Resolution' ).onChange( function( value ) {
-		canvas.width = value;
-		canvas.height = value;
-		renderer.setSize( canvas.width, canvas.height );
-	} );
-	stats = new Stats();
-	document.body.appendChild( stats.dom );
+
+	// var gui = new dat.GUI();
+	// gui.add( config, 'resolution', [ '256', '512', '800' ] ).name( 'Resolution' ).onChange( function( value ) {
+	// 	canvas.width = value;
+	// 	canvas.height = value;
+	// 	renderer.setSize( canvas.width, canvas.height );
+	// } );
+	// stats = new Stats();
+	// document.body.appendChild( stats.dom );
 }
 
 
-function render( timestamp ) {
-	stats.begin();
+function render( timestamp, skip_request ) {
+	// stats.begin();
 
-	// update camera
-	var _y = 3 * (mouse.y - 0.5);
-	var _x = 6 * mouse.x;
-	position_camera.position.set( 10. * Math.cos(_x) * Math.cos(_y), 10. * Math.sin(_y), 10. * Math.sin(_x) * Math.cos(_y));
+	// update camera, always look at center
+	var _y = 3.14 * (mouse.y - 0.5) / 2. + parseFloat(altitude_control.value);
+	var _x = 3 * mouse.x + parseFloat(azimuth_control.value);
+	var r = 12.;
+	position_camera.position.set( r * Math.cos(_x) * Math.cos(_y), r * Math.sin(_y), r * Math.sin(_x) * Math.cos(_y));
 	position_camera.lookAt( new THREE.Vector3( 0.0, 0.0, 0.0 ) );
 
 
@@ -318,23 +339,26 @@ function render( timestamp ) {
 	dummy_material.uniforms.weights_W.value = weights_W;
 	dummy_material.uniforms.weights_V.value = weights_V;
 
-	dummy_material.uniforms.resolution.value = new THREE.Vector2( canvas.width, canvas.height );
+	dummy_material.uniforms.resolution.value = new THREE.Vector2( renderer.getSize().width, renderer.getSize().width );
 	dummy_material.uniforms.cameraPos.value = position_camera.getWorldPosition();
 	dummy_material.uniforms.cameraDir.value = position_camera.getWorldDirection();
-	dummy_material.uniforms.surface_level.value = timestamp / 5000.;
+	var level_value = level_control.value;
+	if ( animate_control.checked ) {
+		level_value = (timestamp / (1000. * animation_loop) ) % 1;
+	}
+
+	dummy_material.uniforms.surface_level.value = level_value;
 	renderer.autoClear = false;
+	renderer.clear();
 	renderer.render( lines_scene, position_camera );
 	renderer.render( dummy_scene, dummy_camera );
-	// lines_renderer.render( lines_scene, camera );
-	stats.end();
-	requestAnimationFrame( render );
+
+	if( capturer ) capturer.capture( renderer.domElement );
+	// stats.end();
+	if( !skip_request) requestAnimationFrame( render );
 }
 
 
-function onMouseMove( e ) {
-	mouse.x = e.offsetX / canvas.width;
-	mouse.y = e.offsetY / canvas.height;
-}
 
 var n_input = 3 + 1
 var n_hidden = 8
@@ -374,26 +398,28 @@ initWeightsRandom();
 document.getElementById('randomize_button').onclick = initWeightsRandom;
 
 function addOnWheel(elem, handler) {
-	if (elem.addEventListener) {
-		if ('onwheel' in document) {
-			// IE9+, FF17+
-			elem.addEventListener("wheel", handler);
-		} else if ('onmousewheel' in document) {
-			// a bit deprecated
-			elem.addEventListener("mousewheel", handler);
-		} else {
-			// 3.5 <= Firefox < 17
-			elem.addEventListener("MozMousePixelScroll", handler);
-		}
-	} else { // IE8-
-		text.attachEvent("onmousewheel", handler);
+	if ('onwheel' in document) {
+		// IE9+, FF17+
+		elem.addEventListener("wheel", handler);
+	} else if ('onmousewheel' in document) {
+		// a bit deprecated
+		elem.addEventListener("mousewheel", handler);
+	} else {
+		// 3.5 <= Firefox < 17
+		elem.addEventListener("MozMousePixelScroll", handler);
 	}
 }
 
 
 var control_cells = [];
 
+var lastedit_timestamp = +new Date();
+
 function updateWeight(cell, delta){
+	var timestamp = + new Date();
+	if ((delta != 0) && (timestamp - lastedit_timestamp < 300)) return;
+	// it is hard to work well on different devices
+	delta = - Math.sign(delta) * 0.15;
 	var layer = cell.position_layerij[0];
 	var i = cell.position_layerij[1];
 	var j = cell.position_layerij[2];
@@ -461,3 +487,26 @@ createControlsTable();
 init();
 render();
 
+function saveAndDownloadVideo(format){
+	var canvas = document.getElementById('main_canvas');
+	var context = canvas.getContext('webgl');
+
+	capturer = new CCapture( { 
+		format: format, 
+		framerate: 10,
+		verbose: true,
+		workersPath: 'utils/',
+		name: 'neural_network_3d',
+		quality: 90
+	} );
+	capturer.start();
+	for(var timestamp = 0; timestamp < animation_loop * 1000; timestamp += 100){
+		render(timestamp, true);
+	}
+	capturer.stop();
+	capturer.save();
+	capturer = null;
+}
+
+document.getElementById('makegif_button').onclick = function(){saveAndDownloadVideo('gif')};
+document.getElementById('makemov_button').onclick = function(){saveAndDownloadVideo('webm')};

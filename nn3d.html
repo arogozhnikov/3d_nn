@@ -8,34 +8,35 @@
 	<style type="text/css">
 		body {
 			background-color: black;
-			/*background-color: grey;*/
 			margin: 0;
 			padding: 0;
 			min-width: 800px;
-		}
-		
-		a {
-			color: skyblue
-		}
-		
-		canvas {
-			display: block;
-			/*position: absolute;*/
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			margin: auto;
-		}
-		#control_container{
-			text-align: center;
-			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 			color: #bbb;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			font-size: 16px;
 		}
-		.control-group{
-			display: inline-block;
+
+		a {
+			color: skyblue;
+		}
+
+		.demo-container{
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+		}
+
+		#canvas_container canvas{
+			margin: 20px;
+		}
+		
+		.control_container{
+			margin-top: 20px;
 			text-align: center;
-			margin-right: 30px;
+		}
+		#main_controls{
+			margin: 10px;
 		}
 		table.control-table {
 			margin: 20px auto;
@@ -60,38 +61,118 @@
 		.button-control:hover{
 			background-color: #777;			
 		}
+		.invisible{
+			display: none;
+		}
+		.description{
+			color: #aaa;
+			max-width: 800px;
+			margin: 15px auto;
+		}
+		.control_group{
+			margin: 10px;
+			display: inline-block;
+		}
 	</style>
 </head>
 
 <body>
-	<div id="canvas_container">
-		
-	</div>
-	<div id='control_container'>
-		<div id='main_controls'>
-			<span class='control-group button-control' id='randomize_button' >Randomize weights!</span>
-			<span class='control-group'>
+	<div class='demo-container'>
+		<div id="canvas_container">
+			<!-- canvas is here -->
+		</div>
+		<div class='control_container'>
+			<div>
 				<input type="checkbox" checked="checked" name="animate_checkbox" id="animate_checkbox" />
 				<label for="animate_checkbox">animate level of surface</label>
-			</span>			
-			<span class='control-group'>
-				x =<span id='level_display'> </span> <br />
-				<input type="range" name="animate_level" id="animate_level" min="0" max="1" />
-				<!--<label for="animate_level">animate level of surface</label>-->
-			</span>			
+			</div>			
+			<div class='invisible' id='surface-control-group'>
+				level of surface: <span id='level_display'> </span> <br />
+				<input type="range" name="animate_level" id="animate_level" min="0" max="1" step="0.01"    />
+			</div>			
+			<div>
+				<h2>Weights of the network</h2>
+				<small>
+					red is 1, blue is -1, <strong>use mouse wheel</strong> to change weights
+				</small>
+			</div>
+			<div id='control_container'>
+			</div>
+			<div style='text-align: center;'>
+				<span class='button-control' id='randomize_button' >Randomize weights!</span>
+			</div>
 		</div>
-		<span class='control'></span>
+	</div>
+	<div class='control_container'>
+		<label class='control_group'> 
+			camera azimuth <br />
+			<input type="range" name="camera_azimuth_control" id="camera_azimuth_control" min="-3.14" max="3.14" step="0.05" value="0.7"   />
+		</label>
+		<label class='control_group'> 
+			camera altitude <br />
+			<input type="range" name="camera_altitide_control" id="camera_altitide_control" min="-1.57" max="1.57" step="0.02" value='0.2'   />			
+		</label>
+		<span class='button-control' id='makegif_button' >Record a gif! <br/> <small>takes a while</small></span>
+		<span class='button-control' id='makemov_button' >Record a video! <br /> <small>chromium browsers only</small></span>
 	</div>
 
-	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+	<div class='description'>
+		<h1>Marching neural network</h1>
+		<h2>Visualizing level surfaces of a neural network with raymarching</h2>
+		<p>
+			In this demonstration you can play with a simple neural network in 3 spacial dimensions 
+			and visualize the functions the network produces (those are quite interesting despite the simplicity of a network, just click 'randomize weights' button several times).
+		</p>
+		<p>
+			Technically, visualization employs a variation of raymarching technique in computer graphics, 
+			thus everything is computed with shaders only (and neural network is calculated with shareds as well). 
+		</p>
+		<p>
+			Animated <strong>surfaces</strong> are level surfaces of a neural network. 
+			You can stop animation and choose level of surface yourself, pay attention that demo shows surfaces with all levels that differ by integer: <br />
+			f(x) = ... , level-1, level, level+1, ... <br />
+			that is why animation is periodic.
+		</p>
+		<p>
+			Sparks that are following surfaces demonstrate the regions with rapid change (large gradient), sparks' color demonstrates level of surface they are following (red is higher).
+			As the level is changing, the color of sparks also changes (from blue to red).
+		</p>
+		<h2>Architecture and manipulating weights</h2>
+		<p>
+			Network has 4 inputs: 3 spacial inputs (x, y, z) + intercept term (1), 8 hidden neurons in a single hidden layer (h<sub>1</sub>, ..., h<sub>8</sub>) and a single output.
+			Weights of the network are connections between inputs and hidden layer, and between hidden layer and output. 
+			Tanh is used as an activation in hidden layer.
+		</p>
+		<p>
+			Circles in the scheme correspond to weights, red is +1, blue is -1. 
+			You can change the weights: hold cursor over circle and use mouse wheel.
+		</p>
+		<h2>
+			Inspiration
+		</h2>
+		<p>
+			Inspired by <a href='http://iquilezles.org/www/articles/raymarchingdf/raymarchingdf.htm'>works</a> by Inigo Quilez on raymarching singed distance fields 
+			and his <a href='https://www.shadertoy.com/user/iq'>shadertoy</a> demos. 
+			And also by a <a href='https://www.youtube.com/watch?v=s8nFqwOho-s'>demo talk at NVScene</a> by Johann Korndorfer.
+		</p>
+		<p>
+			Made by Alex Rogozhnikov (<a href='http://github.com/arogozhnikov'>github</a>, <a href='http://arogozhnikov.github.io/'>blog</a>).
+		</p>
+	</div>
 
-	<script src="https://threejs.org/build/three.js"></script>
-	<script src="https://threejs.org/examples/js/controls/FlyControls.js"></script>
+	<script src="utils/three.js"></script>
 
-	<script src="https://threejs.org/examples/js/libs/stats.min.js"></script>
-	<script src="https://threejs.org/examples/js/libs/dat.gui.min.js"></script>
+	<!--<script src="https://threejs.org/examples/js/libs/stats.min.js"></script>-->
+	<!--<script src="https://threejs.org/examples/js/libs/dat.gui.min.js"></script>-->
+
+	<script src='utils/CCapture.all.min.js' ></script>
 
 	<script src='nn3d.js' ></script>
+
+	<!--<script type="text/javascript" src="jsgif-master/LZWEncoder.js"></script>
+	<script type="text/javascript" src="jsgif-master/NeuQuant.js"></script>
+	<script type="text/javascript" src="jsgif-master/GIFEncoder.js"></script>
+	<script type="text/javascript" src="jsgif-master/b64.js"></script>-->
 
 </body>
 
