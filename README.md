@@ -8,7 +8,7 @@ Demo: [https://arogozhnikov.github.io/3d_nn/](https://arogozhnikov.github.io/3d_
 
 <center>
     <a href='https://arogozhnikov.github.io/3d_nn/' />
-        <img src='https://raw.githubusercontent.com/arogozhnikov/3d_nn/master/neural_network_3d.gif' />
+        <img src='https://raw.githubusercontent.com/arogozhnikov/3d_nn/master/images/neural_network_3d.gif' />
     </a>
 </center>
 
