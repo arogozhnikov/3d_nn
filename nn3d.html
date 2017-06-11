@@ -81,15 +81,7 @@
 		<div id="canvas_container">
 			<!-- canvas is here -->
 		</div>
-		<div class='control_container'>
-			<div>
-				<input type="checkbox" checked="checked" name="animate_checkbox" id="animate_checkbox" />
-				<label for="animate_checkbox">animate level of surface</label>
-			</div>			
-			<div class='invisible' id='surface-control-group'>
-				level of surface: <span id='level_display'> </span> <br />
-				<input type="range" name="animate_level" id="animate_level" min="0" max="1" step="0.01"    />
-			</div>			
+		<div class='control_container'>		
 			<div>
 				<h2>Weights of the network</h2>
 				<small>
@@ -102,6 +94,30 @@
 				<span class='button-control' id='randomize_button' >Randomize weights!</span>
 			</div>
 		</div>
+	</div>
+	<div class='control_container'>
+		<label class='control_group'> 
+			<input type="checkbox" name="show_surface_control" id="show_surface_control" checked="checked" />
+			show surface
+		</label>
+		<label class='control_group'> 
+			<input type="checkbox" name="show_sparks_control" id="show_sparks_control" checked="checked" />
+			show sparks
+		</label>
+		<label class='control_group'> 
+			<input type="checkbox" name="show_axes_control" id="show_axes_control" checked="checked" />
+			show axes
+		</label>
+		<span class='control_group'>
+			<div>
+				<input type="checkbox" checked="checked" name="animate_checkbox" id="animate_checkbox" />
+				<label for="animate_checkbox">animate level of surface</label>
+			</div>			
+			<div class='invisible' id='surface-control-group'>
+				level of surface: <span id='level_display'> </span> <br />
+				<input type="range" name="animate_level" id="animate_level" min="0" max="1" step="0.01"    />
+			</div>			
+		</span>
 	</div>
 	<div class='control_container'>
 		<label class='control_group'> 
