@@ -320,7 +320,7 @@ function init() {
 		}
 	}	
 
-	helper = new THREE.AxisHelper(6.);
+	helper = new THREE.AxisHelper(5.);
 	helper.material.transparent = true;
 	helper.material.opacity = 0.6;
 	lines_scene.add(helper);
