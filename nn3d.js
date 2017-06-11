@@ -8,7 +8,7 @@ uniform mat4 weights_W[2];
 uniform vec4 weights_V[2];
 
 const float EPS = 0.01;
-const float OFFSET = EPS * 10.0;
+// const float OFFSET = EPS * 10.0;
 const vec3 lightDir = vec3(0, 1, 0);
 const float blind_radius = 5.;
 
@@ -28,7 +28,6 @@ float evaluate_nn( vec3 p ) {
 }
 
 vec4 sceneColor( vec3 p ) {
-	// sign(sin(length(p) * 10.))
 	return vec4((p + sign(sin(length(p) * 10.))) * 0.1 + 0.5, 1.);
 }
 
@@ -60,27 +59,45 @@ vec3 getRayColor( vec3 origin, vec3 ray) {
 
 	float factor = 0.5;
 	float min_step = 0.02;
+	bool intersected = false;
 	
+	// marching-like loop to find intersection
 	for ( int i = 0; i < 64; i++ ) {
 		dist = evaluate_nn( p ) - surface_level;
 
 		if ( floor(oldDist) != floor(dist) ) {
-			factor *= - 0.5;
-			min_step = 0.;
-		} else {
-			factor *= 1.2;
-		}
-
-		factor = abs(factor);
+			intersected = true;
+			break;
+		} 
+		
+		factor *= 1.2;
 		factor = min(factor, 3.);
-		if ( original_dist != floor(dist) ) {
-			factor = - factor;
-		}
-
+		
 		oldDist = dist;
+		oldDepth = depth;
 		depth += (abs(dist - floor(dist + 0.5)) + min_step) * factor;
 		p = origin + depth * ray;
-		if ( abs(dist - floor(dist + 0.5)) < EPS ) break;
+	}
+
+	float newDepth;
+	float newDist;
+
+	// making it precise with hord-like method
+	if(intersected) {
+		float target_value = floor(max(oldDist, dist));
+		for( int i=0; i < 20; i++) {
+			newDepth = depth - (depth - oldDepth) / (dist - oldDist) * (dist - target_value);
+			newDist = evaluate_nn( origin + newDepth * ray ) - surface_level;
+			if((newDist - target_value) * (oldDist - target_value) < 0.){
+				dist = newDist;
+				depth = newDepth;
+			} else {
+				oldDist = newDist;
+				oldDepth = newDepth;
+			}
+		}
+		dist = newDist;
+		p = origin + newDepth * ray;
 	}
 
 	// left sphere
@@ -309,6 +326,13 @@ function init() {
 	helper.material.opacity = 0.6;
 	lines_scene.add(helper);
 
+	var show_surface_control = document.getElementById('show_surface_control')
+	show_surface_control.onchange = function(){ dummy_mesh.material.visible = show_surface_control.checked; }
+	var show_sparks_control = document.getElementById('show_sparks_control')
+	show_sparks_control.onchange = function(){ lines_material.visible = show_sparks_control.checked; }
+	var show_axes_control = document.getElementById('show_axes_control')
+	show_axes_control.onchange = function(){ helper.material.visible = show_axes_control.checked; }
+
 
 	// var gui = new dat.GUI();
 	// gui.add( config, 'resolution', [ '256', '512', '800' ] ).name( 'Resolution' ).onChange( function( value ) {
@@ -445,6 +469,9 @@ function createControlsTable() {
 	control_cells[0][1].innerHTML = 'y <br /> &darr;';
 	control_cells[0][2].innerHTML = 'z <br /> &darr;';
 	control_cells[0][3].innerHTML = '1 <br /> &darr;';
+	control_cells[0][0].style.color = '#fbb';
+	control_cells[0][1].style.color = '#bbf';
+	control_cells[0][2].style.color = '#bfb';
 	for(var i = 0; i < n_hidden; i++) {
 		control_cells[i + 1][n_input].innerHTML = ' &rarr; h<sub>'+ (i + 1) +'</sub> &rarr;';
 	}
@@ -455,7 +482,9 @@ function createControlsTable() {
 	// first connection
 	for(var i=0; i < n_input; i++) {
 		for(var j=0; j < n_hidden; j++) {
-			var cell = control_cells[j+1][i];
+			// swapping y and z for users pleasure
+			var cell_position = [0, 2, 1, 3][i];
+			var cell = control_cells[j+1][cell_position];
 			cell.position_layerij = [0, i, j]; 
 			cell.classList.add('weight-control');
 		}
