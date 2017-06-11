@@ -8,7 +8,6 @@ uniform mat4 weights_W[2];
 uniform vec4 weights_V[2];
 
 const float EPS = 0.01;
-// const float OFFSET = EPS * 10.0;
 const vec3 lightDir = vec3(0, 1, 0);
 const float blind_radius = 5.;
 
