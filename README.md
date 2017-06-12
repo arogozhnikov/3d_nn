@@ -1,6 +1,6 @@
 # Marching neural networks
 
-Visualizing surface levels of a neural network using webGL + shaders + raymarching technique.
+Visualizing level surfaces of a neural network using webGL + shaders + raymarching technique.
 
 Because we can!
 
