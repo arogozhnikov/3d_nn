@@ -43,40 +43,65 @@ vec3 getRayColor( vec3 origin, vec3 ray) {
 	// origin + alpha * ray has norm of blind_radius
 	// length(origin)^2 + 2 * alpha dot(origin, ray) + alpha^2 * 1 = blind_radius^2
 	float b = dot(origin, ray);
-	float c = pow(length(origin), 2.) - blind_radius * blind_radius; 
-	float alpha = - b + sign(b) * pow(b * b - c, 0.5);
+	float c = dot(origin, origin) - blind_radius * blind_radius; 
+	float alpha = - b + sign(b) * sqrt(b * b - c);
 	origin = origin + alpha * ray;
+	const int loop_length = 64;
+	float step = 2. * sqrt(b * b - c) / float(loop_length);
+
+	// preparing for the loop
 	vec3 p = origin;
-
-	float dist;
-	float depth = 0.0;
-	float oldDepth = 0.0;
-	
-	float oldDist = evaluate_nn( p ) - surface_level;
-	float original_sign = sign(oldDist);
-	float original_dist = floor(oldDist);
-
-	float factor = 0.5;
-	float min_step = 0.02;
+	float original_floor = floor(evaluate_nn( p ) - surface_level);
 	bool intersected = false;
-	
-	// marching-like loop to find intersection
-	for ( int i = 0; i < 64; i++ ) {
-		dist = evaluate_nn( p ) - surface_level;
+	int j = 1;
 
-		if ( floor(oldDist) != floor(dist) ) {
+	for (int i = 1; i < 64; i++ ) {
+		p += step * ray;
+		float current_floor = floor(evaluate_nn( p ) - surface_level);
+		if (current_floor != original_floor){
 			intersected = true;
+			j = i;
 			break;
 		} 
-		
-		factor *= 1.2;
-		factor = min(factor, 3.);
-		
-		oldDist = dist;
-		oldDepth = depth;
-		depth += (abs(dist - floor(dist + 0.5)) + min_step) * factor;
-		p = origin + depth * ray;
 	}
+
+	float depth = step * float(j);
+	float oldDepth = step * float(j - 1);
+	float dist = evaluate_nn( origin + depth * ray ) - surface_level;
+	float oldDist = evaluate_nn( origin + oldDepth * ray ) - surface_level;
+
+
+
+	
+
+	// float dist;
+	// float depth = 0.0;
+	// float oldDepth = 0.0;
+	
+	// float oldDist = evaluate_nn( p ) - surface_level;
+	// float original_dist = floor(oldDist);
+
+	// float factor = 0.5;
+	// float min_step = 0.02;
+	// bool intersected = false;
+	
+	// // marching-like loop to find intersection
+	// for ( int i = 0; i < 64; i++ ) {
+	// 	dist = evaluate_nn( p ) - surface_level;
+
+	// 	if ( floor(oldDist) != floor(dist) ) {
+	// 		intersected = true;
+	// 		break;
+	// 	} 
+		
+	// 	factor *= 1.2;
+	// 	factor = min(factor, 3.);
+		
+	// 	oldDist = dist;
+	// 	oldDepth = depth;
+	// 	depth += (abs(dist - floor(dist + 0.5)) + min_step) * factor;
+	// 	p = origin + depth * ray;
+	// }
 
 	float newDepth;
 	float newDist;
@@ -228,16 +253,6 @@ var capturer = null;
 var mouse = new THREE.Vector2( 0.5, 0.5 );
 var canvas_size = 400;
 var canvas;
-// var stats;
-// var clock = new THREE.Clock();
-// var config = {
-	// saveImage: function() {
-	// 	renderer.render( scene, dummy_camera );
-	// 	window.open( canvas.toDataURL() );
-	// },
-	// freeCamera: false,
-	// resolution: canvas_size
-// };
 
 var animate_control = document.getElementById('animate_checkbox');
 var level_control = document.getElementById('animate_level');
@@ -331,23 +346,11 @@ function init() {
 	show_sparks_control.onchange = function(){ lines_material.visible = show_sparks_control.checked; }
 	var show_axes_control = document.getElementById('show_axes_control')
 	show_axes_control.onchange = function(){ helper.material.visible = show_axes_control.checked; }
-
-
-	// var gui = new dat.GUI();
-	// gui.add( config, 'resolution', [ '256', '512', '800' ] ).name( 'Resolution' ).onChange( function( value ) {
-	// 	canvas.width = value;
-	// 	canvas.height = value;
-	// 	renderer.setSize( canvas.width, canvas.height );
-	// } );
-	// stats = new Stats();
-	// document.body.appendChild( stats.dom );
 }
 
 
 function render( timestamp, skip_request ) {
-	// stats.begin();
-
-	// update camera, always look at center
+	// update camera, always look at the center
 	var _y = 3.14 * (mouse.y - 0.5) / 2. + parseFloat(altitude_control.value);
 	var _x = 3 * mouse.x + parseFloat(azimuth_control.value);
 	var r = 12.;
@@ -377,7 +380,6 @@ function render( timestamp, skip_request ) {
 	renderer.render( dummy_scene, dummy_camera );
 
 	if( capturer ) capturer.capture( renderer.domElement );
-	// stats.end();
 	if( !skip_request) requestAnimationFrame( render );
 }
 
@@ -521,11 +523,11 @@ function saveAndDownloadVideo(format){
 
 	capturer = new CCapture( { 
 		format: format, 
-		framerate: 10,
+		framerate: 10 * 1.5,
 		verbose: true,
 		workersPath: 'utils/',
 		name: 'neural_network_3d',
-		quality: 90
+		quality: 95
 	} );
 	capturer.start();
 	for(var timestamp = 0; timestamp < animation_loop * 1000; timestamp += 100){
