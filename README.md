@@ -2,7 +2,7 @@
 
 Visualizing level surfaces of a neural network using webGL + raymarching technique.
 
-All the NN-related stuff computing using shaders, thus requires GPU.
+All the NN-related computing uses shaders, thus requires GPU.
 
 Demo: [https://arogozhnikov.github.io/3d_nn/](https://arogozhnikov.github.io/3d_nn/)
 
