@@ -6,11 +6,12 @@ All the NN-related stuff computing using shaders, thus requires GPU.
 
 Demo: [https://arogozhnikov.github.io/3d_nn/](https://arogozhnikov.github.io/3d_nn/)
 
-<center>
-    <a href='https://arogozhnikov.github.io/3d_nn/' />
-        <img src='https://raw.githubusercontent.com/arogozhnikov/3d_nn/master/images/neural_network_3d.gif' width='300' height='300' />
-    </a>
-</center>
+
+<a href='https://arogozhnikov.github.io/3d_nn/' />
+    <img src='https://raw.githubusercontent.com/arogozhnikov/3d_nn/master/images/screen_capture.png' height='300' />
+    <img src='https://raw.githubusercontent.com/arogozhnikov/3d_nn/master/images/neural_network_3d.gif' width='300' height='300' />
+</a>
+
 
 ## Used libraries
 
