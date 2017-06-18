@@ -65,83 +65,43 @@ vec3 getRayColor( vec3 origin, vec3 ray) {
 		} 
 	}
 
-	float depth = step * float(j);
-	float oldDepth = step * float(j - 1);
-	float dist = evaluate_nn( origin + depth * ray ) - surface_level;
-	float oldDist = evaluate_nn( origin + oldDepth * ray ) - surface_level;
-
-
-
-	
-
-	// float dist;
-	// float depth = 0.0;
-	// float oldDepth = 0.0;
-	
-	// float oldDist = evaluate_nn( p ) - surface_level;
-	// float original_dist = floor(oldDist);
-
-	// float factor = 0.5;
-	// float min_step = 0.02;
-	// bool intersected = false;
-	
-	// // marching-like loop to find intersection
-	// for ( int i = 0; i < 64; i++ ) {
-	// 	dist = evaluate_nn( p ) - surface_level;
-
-	// 	if ( floor(oldDist) != floor(dist) ) {
-	// 		intersected = true;
-	// 		break;
-	// 	} 
-		
-	// 	factor *= 1.2;
-	// 	factor = min(factor, 3.);
-		
-	// 	oldDist = dist;
-	// 	oldDepth = depth;
-	// 	depth += (abs(dist - floor(dist + 0.5)) + min_step) * factor;
-	// 	p = origin + depth * ray;
-	// }
 
 	float newDepth;
-	float newDist;
+	float newValue;
+	float value;
+
+	if ( !intersected ) discard;
 
 	// making it precise with hord-like method
-	if(intersected) {
-		float target_value = floor(max(oldDist, dist));
-		for( int i=0; i < 20; i++) {
-			newDepth = depth - (depth - oldDepth) / (dist - oldDist) * (dist - target_value);
-			newDist = evaluate_nn( origin + newDepth * ray ) - surface_level;
-			if((newDist - target_value) * (oldDist - target_value) < 0.){
-				dist = newDist;
-				depth = newDepth;
-			} else {
-				oldDist = newDist;
-				oldDepth = newDepth;
-			}
-		}
-		dist = newDist;
-		p = origin + newDepth * ray;
-	}
+	float lDepth = step * float(j - 1);
+	float rDepth = step * float(j);
 
-	// left sphere
-	if (length(p) > blind_radius) {
-		discard;
+	float lValue = evaluate_nn( origin + lDepth * ray ) - surface_level;
+	float rValue = evaluate_nn( origin + rDepth * ray ) - surface_level;
+
+	float target_value = floor(max(lValue, rValue));
+	for( int i=0; i < 10; i++) {
+		newDepth = lDepth - (lDepth - rDepth) / (lValue - rValue) * (lValue - target_value);
+		p = origin + newDepth * ray;
+		newValue = evaluate_nn( p ) - surface_level;
+		if((newValue - target_value) * (rValue - target_value) < 0.){
+			lValue = newValue;
+			lDepth = newDepth;
+		} else {
+			rValue = newValue;
+			rDepth = newDepth;
+		}
 	}
+	// output is p and newValue
 
 	// hit check and calc color
-	vec3 color;
-	if ( abs(dist - floor(dist + 0.5)) < EPS ) {
-		vec3 normal = getNormal(p);
-		if(dot(normal, ray) > 0.){
-			normal = - normal;
-		}
-		float diffuse = clamp( dot( lightDir, normal ), 0.3, 1.0 );
-		float specular = pow( clamp( dot( reflect( lightDir, normal ), ray ), 0.0, 1.0 ), 10.0 ) + 0.2;
-		color = ( sceneColor( p ).rgb * diffuse + vec3( 0.7 ) * specular ) ;
-	} else {
-		discard;
+	vec3 normal = getNormal(p);
+	if(dot(normal, ray) > 0.){
+		normal = - normal;
 	}
+	float diffuse = clamp( dot( lightDir, normal ), 0.3, 1.0 );
+	float specular = pow( clamp( dot( reflect( lightDir, normal ), ray ), 0.0, 1.0 ), 10.0 ) + 0.2;
+	vec3 color = ( sceneColor( p ).rgb * diffuse + vec3( 0.7 ) * specular ) ;
 	return color; 
 }
 
@@ -295,8 +255,10 @@ function init() {
 	dummy_scene.add( dummy_mesh );
 
 	renderer = new THREE.WebGLRenderer();
-	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setPixelRatio( 1 );
+	// renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( canvas_size, canvas_size );
+
 
 	canvas = renderer.domElement;
 	canvas.addEventListener( 'mousemove', function( e ) {
@@ -308,6 +270,8 @@ function init() {
 		mouse.y = 0.5;
 	});
 	canvas.id = 'main_canvas';
+	canvas.width = canvas_size;
+	canvas.height = canvas_size;
 	document.getElementById('canvas_container').appendChild( canvas ); 
 
 	// TODO convert set of lines to a single line
@@ -540,3 +504,7 @@ function saveAndDownloadVideo(format){
 
 document.getElementById('makegif_button').onclick = function(){saveAndDownloadVideo('gif')};
 document.getElementById('makemov_button').onclick = function(){saveAndDownloadVideo('webm')};
+
+// so far we are running, so deleting notification
+document.getElementById('not_working_notification').outerHTML = "";
+
