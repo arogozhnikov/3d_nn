@@ -77,6 +77,28 @@
 </head>
 
 <body>
+	<div class='description'>
+		<h1>Marching neural network</h1>
+		<h2>Visualizing level surfaces of a neural network with raymarching</h2>
+		<p>
+			Artificial neural networks became very popular in recent years, 
+			mostly because of their success in tasks of image and speech recognition.
+			While research in this area started more than 60 years ago and many different network architectures were 
+			developed during this time, the only architecture that became popular in applications is MLP (multilayer perceptron),
+			trained with varations of gradiesnt descent. Later based on MLP approach of training application-specific architectures emerged (such as convolutional and recurrent networks).
+		</p>
+		<p>
+			Probably it is a good idea to understand the behavior of neural network by visualizing it. 
+			While dependencies modelled in machine learning, and in particular by neural networks, are multidimensional, 
+			we are quite limited in our visualization abilities. Here we use 
+		</p>
+		<p>
+			In the demo below you can play with a small MLP to see how flexible is this model. 
+		</p>
+		<p>
+			<strong>Visualization requires not-too-old browser and GPU acceleration. Works on modern mobile devices.</strong>
+		</p>
+	</div>
 	<div class='demo-container'>
 		<div id="canvas_container">
 			<!-- canvas is here -->
@@ -132,17 +154,12 @@
 		<span class='button-control' id='makemov_button' >Record a video! <br /> <small>chromium browsers only</small></span>
 	</div>
 
-	<div class='description'>
-		<h1>Marching neural network</h1>
-		<h2>Visualizing level surfaces of a neural network with raymarching</h2>
+	<div class='description'>		
 		<p>
 			In this demonstration you can play with a simple neural network in 3 spacial dimensions 
 			and visualize the functions the network produces (those are quite interesting despite the simplicity of a network, just click 'randomize weights' button several times).
 		</p>
-		<p>
-			Technically, visualization employs a variation of raymarching technique in computer graphics, 
-			thus everything is computed with shaders only (and neural network is calculated with shareds as well). 
-		</p>
+
 		<p>
 			Animated <strong>surfaces</strong> are level surfaces of a neural network. 
 			You can stop animation and choose level of surface yourself, pay attention that demo shows surfaces with all levels that differ by integer: <br />
@@ -150,19 +167,29 @@
 			that is why animation is periodic.
 		</p>
 		<p>
-			Sparks that are following surfaces demonstrate the regions with rapid change (large gradient), sparks' color demonstrates level of surface they are following (red is higher).
+			Sparks that are following level surfaces demonstrate the regions with rapid change (small gradient), sparks' color demonstrates the level of surface they are following (red is higher).
 			As the level is changing, the color of sparks also changes (from blue to red).
 		</p>
 		<h2>Architecture and manipulating weights</h2>
 		<p>
 			Network has 4 inputs: 3 spacial inputs (x, y, z) + intercept term (1), 8 hidden neurons in a single hidden layer (h<sub>1</sub>, ..., h<sub>8</sub>) and a single output.
-			Weights of the network are connections between inputs and hidden layer, and between hidden layer and output. 
+			Weights of the network are connections between inputs and neurons in a hidden layer, and between neurons in a hidden layer and output. 
 			Tanh is used as an activation in hidden layer.
 		</p>
 		<p>
-			Circles in the scheme correspond to weights, red is +1, blue is -1. 
-			You can change the weights: hold cursor over circle and use mouse wheel.
+			Circles in the scheme correspond to weights of a network and describe the strength of connection between neurons, red is +1, blue is -1. 
+			You can change the weights: hold cursor over any circle and use mouse wheel.
 		</p>
+		<h2>Visualization technique</h2>
+		<p>
+			This demonstration employs a variation of <a href='https://en.wikipedia.org/wiki/Volume_ray_casting'>raymarching technique</a> in computer graphics 
+			(also known as volume ray casting).
+		</p>
+		<p>
+			It is highly recommended to have a good GPU-acceleration to enjoy the picture, 
+			because in raymarching everything is computed with shaders only (and neural network is calculated with shaders as well).  
+		</p>
+
 		<h2>
 			Inspiration
 		</h2>
@@ -171,6 +198,16 @@
 			and his <a href='https://www.shadertoy.com/user/iq'>shadertoy</a> demos. 
 			And also by a <a href='https://www.youtube.com/watch?v=s8nFqwOho-s'>demo talk at NVScene</a> by Johann Korndorfer.
 		</p>
+		<h2>
+			See also
+		</h2>
+		<ul>
+			<li> <a href='http://cs.stanford.edu/people/karpathy/convnetjs/'>Convnet.js demonstrations</a> by Andrej Karpathy </li>
+			<li> <a href='http://arogozhnikov.github.io/2016/06/24/gradient_boosting_explained.html'>Gradient Boosting explained in 3d</a> </li>
+			<li> <a href='http://arogozhnikov.github.io/2016/12/19/markov_chain_monte_carlo.html'>Monte Carlo explained in 3d</a> </li>
+			<li> <a href='http://arogozhnikov.github.io/2016/04/28/demonstrations-for-ml-courses.html'>Awesome ML demonstrations</a> </li>
+		</ul>
+
 		<p style="margin: 2em 0px;">
 			Made by Alex Rogozhnikov (<a href='http://github.com/arogozhnikov'>github</a>, <a href='http://arogozhnikov.github.io/'>blog</a>).
 		</p>

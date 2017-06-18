@@ -1,6 +1,8 @@
 # Marching neural networks
 
-Visualizing level surfaces of a neural network using webGL + shaders + raymarching technique.
+Visualizing level surfaces of a neural network using webGL + raymarching technique.
+
+All the NN-related stuff computing using shaders, thus requires GPU.
 
 Demo: [https://arogozhnikov.github.io/3d_nn/](https://arogozhnikov.github.io/3d_nn/)
 
@@ -12,4 +14,4 @@ Demo: [https://arogozhnikov.github.io/3d_nn/](https://arogozhnikov.github.io/3d_
 
 ## Used libraries
 
-[THREE.js](https://github.com/mrdoob/three.js) and [CCapture.js](https://github.com/spite/ccapture.js).
+Visualization relies on [THREE.js](https://github.com/mrdoob/three.js) and [CCapture.js](https://github.com/spite/ccapture.js).
