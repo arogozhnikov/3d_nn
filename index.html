@@ -4,7 +4,7 @@
 <head>
 	<title>Neural networks in 3d with webGL</title>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="viewport" content="user-scalable=yes, minimum-scale=0.3, maximum-scale=2.0">
 	<style type="text/css">
 		body {
 			background-color: black;
@@ -85,15 +85,16 @@
 			mostly because of their success in tasks of image and speech recognition.
 			While research in this area started more than 60 years ago and many different network architectures were 
 			developed during this time, the only architecture that became popular in applications is MLP (multilayer perceptron),
-			trained with varations of gradiesnt descent. Later based on MLP approach of training application-specific architectures emerged (such as convolutional and recurrent networks).
+			parametrized multilayer functions trained (optimized) with variations of gradiesnt descent. 
+			Later based on MLP approach of training application-specific architectures emerged (such as convolutional and recurrent networks).
 		</p>
 		<p>
-			Probably it is a good idea to understand the behavior of neural network by visualizing it. 
-			While dependencies modelled in machine learning, and in particular by neural networks, are multidimensional, 
-			we are quite limited in our visualization abilities. Here we use 
+			Probably it is a good idea to understand the behavior of a neural network by visualizing it. 
+			While dependencies modelled in machine learning, in particular by neural networks, are multidimensional, 
+			we are limited in our visualization abilities to three dimensions.
 		</p>
 		<p>
-			In the demo below you can play with a small MLP to see how flexible is this model. 
+			In the demo below you can play with a very small MLP with three inputs (x, y, z) to see how flexible is this model. 
 		</p>
 		<p>
 			<strong>Visualization requires not-too-old browser and GPU acceleration. Works on modern mobile devices.</strong>
@@ -205,11 +206,12 @@
 			<li> <a href='http://cs.stanford.edu/people/karpathy/convnetjs/'>Convnet.js demonstrations</a> by Andrej Karpathy </li>
 			<li> <a href='http://arogozhnikov.github.io/2016/06/24/gradient_boosting_explained.html'>Gradient Boosting explained in 3d</a> </li>
 			<li> <a href='http://arogozhnikov.github.io/2016/12/19/markov_chain_monte_carlo.html'>Monte Carlo explained in 3d</a> </li>
-			<li> <a href='http://arogozhnikov.github.io/2016/04/28/demonstrations-for-ml-courses.html'>Awesome ML demonstrations</a> </li>
+			<li> <a href='http://arogozhnikov.github.io/2016/04/28/demonstrations-for-ml-courses.html'>Other awesome ML demonstrations</a> </li>
 		</ul>
 
 		<p style="margin: 2em 0px;">
-			Made by Alex Rogozhnikov (<a href='http://github.com/arogozhnikov'>github</a>, <a href='http://arogozhnikov.github.io/'>blog</a>).
+			Made by <a href='http://github.com/arogozhnikov'>Alex Rogozhnikov</a> (<a href='http://arogozhnikov.github.io/'>blog</a>).
+			Source of this demo can be found in <a href='https://github.com/arogozhnikov/3d_nn'>repository</a>.
 		</p>
 		<a href="https://github.com/arogozhnikov/3d_nn"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/c6625ac1f3ee0a12250227cf83ce904423abf351/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png"></a>
 	</div>
