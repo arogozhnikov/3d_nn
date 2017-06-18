@@ -5,6 +5,22 @@
 	<title>Neural networks in 3d with webGL</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="user-scalable=yes, minimum-scale=0.3, maximum-scale=2.0">
+
+
+	<meta name="description" content="Visualizing neural networks in 3d">
+
+	<meta name="twitter:card" value="summary_large_image">
+	<meta name="twitter:title" content="Visualizing neural networks in 3d">
+	<meta name="twitter:description" content="Play with level surfaces of a simple neural network right in your browser">
+	<meta name="twitter:url" content="https://arogozhnikov.github.io/3d_nn">
+	<meta name="twitter:image" content="https://raw.githubusercontent.com/arogozhnikov/3d_nn/master/images/screen_capture.png">
+
+	<meta property="og:type" content="article" />
+	<meta property="og:title" content="Visualizing neural networks in 3d" />
+	<meta property="og:description" content="Play with level surfaces of a simple neural network right in your browser" />
+	<meta property="og:url" content="https://arogozhnikov.github.io/3d_nn" />
+	<meta property="og:image" content="https://raw.githubusercontent.com/arogozhnikov/3d_nn/master/images/screen_capture.png" />
+	
 	<style type="text/css">
 		body {
 			background-color: black;
@@ -61,6 +77,12 @@
 		.button-control:hover{
 			background-color: #777;			
 		}
+		#randomize_button{
+			background-color: #474;
+		}
+		#randomize_button:hover{
+			background-color: #696;
+		}
 		.invisible{
 			display: none;
 		}
@@ -84,8 +106,8 @@
 			Artificial neural networks became very popular in recent years, 
 			mostly because of their success in tasks of image and speech recognition.
 			While research in this area started more than 60 years ago and many different network architectures were 
-			developed during this time, the only architecture that became popular in applications is MLP (multilayer perceptron),
-			parametrized multilayer functions trained (optimized) with variations of gradiesnt descent. 
+			developed during first decades of research, the only architecture that became popular in applications is MLP (<a href='https://en.wikipedia.org/wiki/Multilayer_perceptron'>multilayer perceptron</a>)
+			&mdash; parametrized multilayer functions trained (optimized) with variations of gradient descent. 
 			Later based on MLP approach of training application-specific architectures emerged (such as convolutional and recurrent networks).
 		</p>
 		<p>
@@ -94,14 +116,22 @@
 			we are limited in our visualization abilities to three dimensions.
 		</p>
 		<p>
-			In the demo below you can play with a very small MLP with three inputs (x, y, z) to see how flexible is this model. 
+			In the demo below you can play with a very small MLP with three inputs (x, y, z) and observe resulting functions (just to remind, MLP is a neat function) to see how flexible is this model. 
 		</p>
 		<p>
-			<strong>Visualization requires not-too-old browser and GPU acceleration. Works on modern mobile devices.</strong>
+			<strong>Visualization requires not-too-old browser and GPU acceleration. Best on laptops and PCs, but also works on modern mobile devices.</strong>
 		</p>
 	</div>
 	<div class='demo-container'>
 		<div id="canvas_container">
+			<div id='not_working_notification' style="font-size: 1.6em; color: #DAA; ">
+				<p>
+					If you see this message, your browser / device <br /> doesn't support this beautiful demo. 
+				</p>
+				<p>
+					Try more powerful device!
+				</p>
+			</div>
 			<!-- canvas is here -->
 		</div>
 		<div class='control_container'>		
@@ -114,7 +144,7 @@
 			<div id='control_container'>
 			</div>
 			<div style='text-align: center;'>
-				<span class='button-control' id='randomize_button' >Randomize weights!</span>
+				<span class='button-control' id='randomize_button'>Randomize weights!</span>
 			</div>
 		</div>
 	</div>
@@ -163,7 +193,7 @@
 
 		<p>
 			Animated <strong>surfaces</strong> are level surfaces of a neural network. 
-			You can stop animation and choose level of surface yourself, pay attention that demo shows surfaces with all levels that differ by integer: <br />
+			You can stop animation and choose level of surface yourself, note that demo shows surfaces with all equidistant levels that differ by integer: <br />
 			f(x) = ... , level-1, level, level+1, ... <br />
 			that is why animation is periodic.
 		</p>
@@ -171,7 +201,7 @@
 			Sparks that are following level surfaces demonstrate the regions with rapid change (small gradient), sparks' color demonstrates the level of surface they are following (red is higher).
 			As the level is changing, the color of sparks also changes (from blue to red).
 		</p>
-		<h2>Architecture and manipulating weights</h2>
+		<h2>Architecture of the network and manipulating its weights</h2>
 		<p>
 			Network has 4 inputs: 3 spacial inputs (x, y, z) + intercept term (1), 8 hidden neurons in a single hidden layer (h<sub>1</sub>, ..., h<sub>8</sub>) and a single output.
 			Weights of the network are connections between inputs and neurons in a hidden layer, and between neurons in a hidden layer and output. 
@@ -197,7 +227,7 @@
 		<p>
 			Inspired by <a href='http://iquilezles.org/www/articles/raymarchingdf/raymarchingdf.htm'>works</a> by Inigo Quilez on raymarching singed distance fields 
 			and his <a href='https://www.shadertoy.com/user/iq'>shadertoy</a> demos. 
-			And also by a <a href='https://www.youtube.com/watch?v=s8nFqwOho-s'>demo talk at NVScene</a> by Johann Korndorfer.
+			And also by Johann Korndorfer's <a href='https://www.youtube.com/watch?v=s8nFqwOho-s'>demo talk at NVScene</a>.
 		</p>
 		<h2>
 			See also
