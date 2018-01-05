@@ -105,7 +105,7 @@
 		<p>
 			Artificial neural networks became very popular in recent years, 
 			mostly because of their success in tasks of image and speech recognition.
-			While research in this area started more than 60 years ago and many different network architectures were 
+			Research in this area started more than 60 years ago and many different network architectures were 
 			developed during first decades of research, the only architecture that became popular in applications is MLP (<a href='https://en.wikipedia.org/wiki/Multilayer_perceptron'>multilayer perceptron</a>)
 			&mdash; parametrized multilayer functions trained (optimized) with variations of gradient descent. 
 			Later based on MLP approach of training application-specific architectures emerged (such as convolutional and recurrent networks).
@@ -116,7 +116,8 @@
 			we are limited in our visualization abilities to three dimensions.
 		</p>
 		<p>
-			In the demo below you can play with a very small MLP with three inputs (x, y, z) and observe resulting functions (just to remind, MLP is a neat function) to see how flexible is this model. 
+			In the demo below you can play with a very small MLP with three inputs (x, y, z) and observe resulting functions 
+			(just to remind, MLP is a neat function) to see how flexible it is. 
 		</p>
 		<p>
 			<strong>Visualization requires not-too-old browser and GPU acceleration. Best on laptops and PCs, but also works on modern mobile devices.</strong>
@@ -198,18 +199,20 @@
 			that is why animation is periodic.
 		</p>
 		<p>
-			Sparks that are following level surfaces demonstrate the regions with rapid change (small gradient), sparks' color demonstrates the level of surface they are following (red is higher).
+			Sparks that are following level surfaces demonstrate the regions with rapid change (small gradient), 
+			sparks' color demonstrates the level of surface they are following (red is higher).
 			As the level is changing, the color of sparks also changes (from blue to red).
 		</p>
-		<h2>Architecture of the network and manipulating its weights</h2>
+		<h2>Architecture of the network</h2>
 		<p>
 			Network has 4 inputs: 3 spacial inputs (x, y, z) + intercept term (1), 8 hidden neurons in a single hidden layer (h<sub>1</sub>, ..., h<sub>8</sub>) and a single output.
 			Weights of the network are connections between inputs and neurons in a hidden layer, and between neurons in a hidden layer and output. 
 			Tanh is used as an activation in hidden layer.
 		</p>
+		<h2>Manipulating the network</h2>
 		<p>
-			Circles in the scheme correspond to weights of a network and describe the strength of connection between neurons, red is +1, blue is -1. 
-			You can change the weights: hold cursor over any circle and use mouse wheel.
+			Circles in the scheme correspond to weights (parmeters) of a network and describe the strength of connection between neurons, red is +1, blue is -1. 
+			You can change the weights: position cursor over any circle and use mouse wheel.
 		</p>
 		<h2>Visualization technique</h2>
 		<p>
@@ -219,6 +222,9 @@
 		<p>
 			It is highly recommended to have a good GPU-acceleration to enjoy the picture, 
 			because in raymarching everything is computed with shaders only (and neural network is calculated with shaders as well).  
+		</p>
+		<p>
+			Update: I've simplified the technique to ray-scanning + hord-like method. It is both faster and produces visually more consistent picture.
 		</p>
 
 		<h2>
@@ -230,7 +236,7 @@
 			And also by Johann Korndorfer's <a href='https://www.youtube.com/watch?v=s8nFqwOho-s'>demo talk at NVScene</a>.
 		</p>
 		<h2>
-			See also
+			Links
 		</h2>
 		<ul>
 			<li> <a href='http://cs.stanford.edu/people/karpathy/convnetjs/'>Convnet.js demonstrations</a> by Andrej Karpathy </li>
@@ -243,15 +249,25 @@
 			Made by <a href='http://github.com/arogozhnikov'>Alex Rogozhnikov</a> (<a href='http://arogozhnikov.github.io/'>blog</a>).
 			Source of this demo can be found in <a href='https://github.com/arogozhnikov/3d_nn'>repository</a>.
 		</p>
-		<a href="https://github.com/arogozhnikov/3d_nn"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/c6625ac1f3ee0a12250227cf83ce904423abf351/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png"></a>
+		<!-- Buttons for github -->
+		<div style='display: flex; justify-content: space-evenly; padding: 30px;'>
+			<a class="github-button" href="https://github.com/arogozhnikov/3d_nn" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star arogozhnikov/3d_nn on GitHub">Star</a>
+			<a class="github-button" href="https://github.com/arogozhnikov/3d_nn/fork" data-icon="octicon-repo-forked" data-size="large" data-show-count="true" aria-label="Fork arogozhnikov/3d_nn on GitHub">Fork</a>
+			<a class="github-button" href="https://github.com/arogozhnikov" data-size="large" data-show-count="true" aria-label="Follow @arogozhnikov on GitHub">Follow @arogozhnikov</a>
+		</div>
+	
 	</div>
 
 	<script src="utils/three.js"></script>
 	<script src='utils/CCapture.all.min.js' ></script>
 	<script src='nn3d.js' ></script>
 
+
 	<!-- Yandex.Metrika counter --> <script type="text/javascript"> (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter32426790 = new Ya.Metrika({ id:32426790, clickmap:true, trackLinks:true, accurateTrackBounce:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks"); </script> <noscript><div><img src="https://mc.yandex.ru/watch/32426790" style="position:absolute; left:-9999px;" alt="" /></div></noscript> <!-- /Yandex.Metrika counter -->
 
+	<!-- Buttons: -->
+	<script async defer src="https://buttons.github.io/buttons.js"></script>
+	
 </body>
 
 </html>

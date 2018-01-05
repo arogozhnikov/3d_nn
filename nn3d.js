@@ -66,9 +66,9 @@ vec3 getRayColor( vec3 origin, vec3 ray) {
 	}
 
 
-	float newDepth;
-	float newValue;
-	float value;
+	// float newDepth;
+	// float newValue;
+	// float value;
 
 	if ( !intersected ) discard;
 
@@ -81,9 +81,9 @@ vec3 getRayColor( vec3 origin, vec3 ray) {
 
 	float target_value = floor(max(lValue, rValue));
 	for( int i=0; i < 10; i++) {
-		newDepth = lDepth - (lDepth - rDepth) / (lValue - rValue) * (lValue - target_value);
+		float newDepth = lDepth - (lDepth - rDepth) / (lValue - rValue) * (lValue - target_value);
 		p = origin + newDepth * ray;
-		newValue = evaluate_nn( p ) - surface_level;
+		float newValue = evaluate_nn( p ) - surface_level;
 		if((newValue - target_value) * (rValue - target_value) < 0.){
 			lValue = newValue;
 			lDepth = newDepth;
@@ -92,7 +92,6 @@ vec3 getRayColor( vec3 origin, vec3 ray) {
 			rDepth = newDepth;
 		}
 	}
-	// output is p and newValue
 
 	// hit check and calc color
 	vec3 normal = getNormal(p);
@@ -274,7 +273,7 @@ function init() {
 	canvas.height = canvas_size;
 	document.getElementById('canvas_container').appendChild( canvas ); 
 
-	// TODO convert set of lines to a single line
+	// TODO convert set of lines to a single line?
 	lines_material = new THREE.ShaderMaterial( {
 		uniforms:       uniforms,
 		vertexShader:   lines_vertex_shader,
@@ -402,19 +401,20 @@ function addOnWheel(elem, handler) {
 
 var control_cells = [];
 
-var lastedit_timestamp = +new Date();
+var startup_timestamp = + new Date();
 
 function updateWeight(cell, delta){
 	var timestamp = + new Date();
-	if ((delta != 0) && (timestamp - lastedit_timestamp < 300)) return;
-	// it is hard to work well on different devices
+	// discard too early editing, except 
+	if ((delta != 0) && (timestamp - startup_timestamp < 300)) return;
+	// it is hard to make it work well on different devices / browsers / touchpads
 	delta = - Math.sign(delta) * 0.15;
 	var layer = cell.position_layerij[0];
 	var i = cell.position_layerij[1];
 	var j = cell.position_layerij[2];
-	weights[layer][j][i] = Math.max(-1, Math.min(1, weights[layer][j][i] + delta));
-	var value = (weights[layer][j][i] + 1) / 2.;
-	value = Math.round(100 * value);
+	var new_value = Math.max(-1, Math.min(1, weights[layer][j][i] + delta))
+	weights[layer][j][i] = new_value;
+	var value = Math.round(100 * (weights[layer][j][i] + 1) / 2.);
 	cell.style.backgroundColor = "rgb(" + (50 + value) + ", 50," + (150 - value) + ")";
 }
 
@@ -471,8 +471,8 @@ function createControlsTable() {
 		addOnWheel(cell, function(e) {
 			e.stopPropagation();
 			e.preventDefault();
-			var delta = e.deltaY || e.detail || e.wheelDelta;
-			updateWeight(e.target, delta * 0.05);
+			var delta = e.deltaY || e.detail || e.wheelDelta || 0.;
+			updateWeight(e.target, delta);
 		});
 	} 
 }
@@ -504,7 +504,6 @@ function saveAndDownloadVideo(format){
 
 document.getElementById('makegif_button').onclick = function(){saveAndDownloadVideo('gif')};
 document.getElementById('makemov_button').onclick = function(){saveAndDownloadVideo('webm')};
-
 // so far we are running, so deleting notification
 document.getElementById('not_working_notification').outerHTML = "";
 
