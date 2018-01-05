@@ -401,14 +401,16 @@ function addOnWheel(elem, handler) {
 
 var control_cells = [];
 
-var startup_timestamp = + new Date();
+var last_timestamp = + new Date();
 
 function updateWeight(cell, delta){
 	var timestamp = + new Date();
-	// discard too early editing, except 
-	if ((delta != 0) && (timestamp - startup_timestamp < 300)) return;
+
 	// it is hard to make it work well on different devices / browsers / touchpads
+	if ((delta != 0) && (timestamp - last_timestamp < 50)) return;
+	last_timestamp = timestamp;
 	delta = - Math.sign(delta) * 0.15;
+
 	var layer = cell.position_layerij[0];
 	var i = cell.position_layerij[1];
 	var j = cell.position_layerij[2];
