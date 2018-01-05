@@ -15,6 +15,6 @@ Demo: [https://arogozhnikov.github.io/3d_nn/](https://arogozhnikov.github.io/3d_
 
 ## Used libraries
 
-Visualization relies on [THREE.js](https://github.com/mrdoob/three.js) and [CCapture.js](https://github.com/spite/ccapture.js).
+Visualization relies on [THREE.js](https://github.com/mrdoob/three.js) for rendering and [CCapture.js](https://github.com/spite/ccapture.js) for capturing animations.
 
-The code is minimalistic and a bit messy, no other dependencies / frameworks.
+The code is minimalistic and a bit messy, but no other dependencies / frameworks.
