@@ -2,7 +2,7 @@
 
 Visualizing level surfaces of a neural network using webGL + raymarching technique.
 
-Correction: technique is close raymarching, but step sizes are computed differently.
+Correction: technique was changed; still close to raymarching, but step sizes are computed differently.
 
 All the NN-related computing uses shaders, thus having GPU is recommended.
 
